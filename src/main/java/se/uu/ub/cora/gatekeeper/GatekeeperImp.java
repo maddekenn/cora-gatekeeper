@@ -107,4 +107,32 @@ public enum GatekeeperImp implements Gatekeeper {
 		return userPickerProvider;
 	}
 
+	@Override
+	public void removeAuthTokenForUser(String authTokenId, String idInUserStorage) {
+		authTokenExists(authTokenId);
+		removeAuthTokenIfUserIdMatches(authTokenId, idInUserStorage);
+	}
+
+	private void authTokenExists(String authTokenId) {
+		if (!pickedUsers.containsKey(authTokenId)) {
+			throw new AuthenticationException("AuthToken does not exist");
+		}
+	}
+
+	private void removeAuthTokenIfUserIdMatches(String authTokenId, String idInUserStorage) {
+		ensureUserIdMathchesTokensUserId(authTokenId, idInUserStorage);
+		pickedUsers.remove(authTokenId);
+	}
+
+	private void ensureUserIdMathchesTokensUserId(String authTokenId, String idInUserStorage) {
+		User storedUser = pickedUsers.get(authTokenId);
+		if (!userInfoLoginIdEqualsStoredLoginId(idInUserStorage, storedUser)) {
+			throw new AuthenticationException("idInUserStorage does not exist");
+		}
+	}
+
+	private boolean userInfoLoginIdEqualsStoredLoginId(String idInUserStorage, User storedUser) {
+		return storedUser.id.equals(idInUserStorage);
+	}
+
 }
